@@ -1,0 +1,15 @@
+<section class="tab standard-form scrollable {{tabs.basic.cssClass}}" data-tab="basic"
+    data-group="{{tabs.basic.group}}"></section>
+
+<fieldset>
+    <legend>Particle Emitter Placement</legend>
+    <div class="form-group slim">
+        <label>{{localize "Coordinates"}} <span class="units">({{localize "Pixels"}})</span></label>
+        <div class="form-fields">
+            <label>X</label>
+            {{formInput fields.x value=source.x}}
+            <label>Y</label>
+            {{formInput fields.y value=source.y}}
+        </div>
+    </div>
+</fieldset>
