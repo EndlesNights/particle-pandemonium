@@ -28,7 +28,7 @@ const updateDataSchema = async () => {
 
   // make sure required fields are present
   for (const scene of game.scenes) {
-    const particleEmitters = foundry.utils.duplicate(scene.flags.particleEmitters || [])
+    const particleEmitters = foundry.utils.duplicate(scene.flags[`particle-pandemonium`] || [])
 
     for (const particleEmitter of particleEmitters) {
       const errors = []
@@ -65,7 +65,7 @@ const updateDataSchema = async () => {
 
     // update data when fixed
     if (sceneErrors.includes(scene.id)) {
-      await scene.update({ 'flags.particleEmitters': particleEmitters })
+      await scene.update({ 'flags.particle-pandemonium': particleEmitters })
     }
   }
 

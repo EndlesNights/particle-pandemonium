@@ -42,10 +42,10 @@ export const injectParticleEmitters = () => {
 
   // add particleEmitters as embedded document for existing scenes
   for (const scene of game.data.scenes) {
-    if (!Array.isArray(scene.flags.particleEmitters)) {
-      scene.flags.particleEmitters = []
+    if (!Array.isArray(scene.flags[`particle-pandemonium`])) {
+      scene.flags[`particle-pandemonium`] = []
     }
-    scene.particleEmitters = foundry.utils.duplicate(scene.flags.particleEmitters || [])
+    scene.particleEmitters = foundry.utils.duplicate(scene.flags[`particle-pandemonium`] || [])
   }
 }
 
@@ -82,7 +82,7 @@ const hookCanvas = () => {
   const origGetLayerByEmbeddedName = Canvas.prototype.getLayerByEmbeddedName
   Canvas.prototype.getLayerByEmbeddedName = function (embeddedName) {
     if (embeddedName === 'ParticleEmitter') {
-      return this.particleEmitters
+      return this.particleEmitters;
     } else {
       return origGetLayerByEmbeddedName.call(this, embeddedName)
     }

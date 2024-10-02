@@ -63,6 +63,7 @@ export class BaseParticleEmitter extends foundry.abstract.Document {
       elevation: new fields.NumberField({required: true, nullable: false, initial: 0}),
       rotation: new fields.AngleField(),
       vision: new fields.BooleanField(),
+      particleFunction: new fields.StringField({required: true}),
       icon: new fields.FilePathField({ categories: ['IMAGE'] }),
       width: new fields.NumberField({ positive: true }),
       height: new fields.NumberField({ positive: true }),

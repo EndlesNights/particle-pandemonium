@@ -1,15 +1,37 @@
-<section class="tab standard-form scrollable {{tabs.basic.cssClass}}" data-tab="basic"
-    data-group="{{tabs.basic.group}}"></section>
-
-<fieldset>
-    <legend>Particle Emitter Placement</legend>
-    <div class="form-group slim">
-        <label>{{localize "Coordinates"}} <span class="units">({{localize "Pixels"}})</span></label>
-        <div class="form-fields">
-            <label>X</label>
-            {{formInput fields.x value=source.x}}
-            <label>Y</label>
-            {{formInput fields.y value=source.y}}
+<form class="flexcol" autocomplete="off" onsubmit="event.preventDefault();">
+    <!-- Sheet Navigation Tabs -->
+    <nav class="sheet-tabs tabs">
+        <a class="item" data-tab="main">
+            <i class="far fa-cauldron"></i> Main Options
+        </a>
+    </nav>
+    <div class="tab" data-tab="main">
+        <legend>Particle Emitter Placement</legend>
+        <div class="form-group">
+            <label>{{ localize "XCoord" }} <span class="units">({{ localize "Pixels" }})</span></label>
+            <input type="text" name="x" placeholder="X" value="{{ data.x }}" data-dtype="Number" />
         </div>
+
+        <div class="form-group">
+            <label>{{ localize "YCoord" }} <span class="units">({{ localize "Pixels" }})</span></label>
+            <input type="text" name="y" placeholder="Y" value="{{ data.y }}" data-dtype="Number" />
+        </div>
+
+        <div class="form-group">
+            <label>Particle Function</label>
+            <select name="particleFunction">
+                {{selectOptions particleFunctionTypes selected=data.particleFunction blank=""}}
+            </select>
+        </div>
+
+        <hr>
+        <section class="function-elements">
+        </section>
     </div>
-</fieldset>
+
+    
+    <!-- Sheet Footer -->
+    <footer class="sheet-footer flexrow">
+        <button type="submit" name="submit" value="1"><i class="far fa-save"></i> Submit</button>
+    </footer>
+</form>

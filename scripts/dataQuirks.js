@@ -8,7 +8,7 @@ export const hookModifyDocument = () => {
     // log and report error for unexpected behaviour for further investigation
     const reportError = (...args) => {
       console.error(...args)
-      ui.notifications.error(game.i18n.localize('particleEmitters.ui.messages.data-update-error'))
+      ui.notifications.error(game.i18n.localize('particle-pandemonium.ui.messages.data-update-error'))
     }
 
     if (eventName === 'modifyDocument' && request.type === 'Scene') {
@@ -49,7 +49,7 @@ export const hookModifyDocument = () => {
           // inject particleEmitters into scene from flags
           for (let i = 0; i < data.length; i++) {
             if ('flags' in data[i]) {
-              value.result[i].particleEmitters = foundry.utils.duplicate(data[i].flags.particleEmitters || [])
+              value.result[i].particleEmitters = foundry.utils.duplicate(data[i].flags[`particle-pandemonium`] || [])
             }
           }
 
@@ -96,14 +96,14 @@ export const hookModifyDocument = () => {
         }
 
         // update particleEmitters
-        scene.update({ 'flags.particleEmitters': particleEmitters })
+        scene.update({ 'flags.particle-pandemonium': particleEmitters })
 
         // create fake backend response
         const response = { ...request, result, userId: game.userId }
         resolve(response)
 
         // send particleEmitter update event
-        game.socket.emit('module.particleEmitters', { eventName, data: response })
+        game.socket.emit('module.particle-pandemonium', { eventName, data: response })
       })
     } else {
       return origDispatch.bind(this)(eventName, request)

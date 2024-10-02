@@ -1,4 +1,4 @@
-export const MODULE_ID = 'particleEmitters'
+export const MODULE_ID = 'particle-pandemonium';
 
 export function registerSettings () {
   game.settings.register(MODULE_ID, 'dataVersion', {
@@ -9,8 +9,8 @@ export function registerSettings () {
   })
 
   game.settings.register(MODULE_ID, 'promptPlayer', {
-    name: 'particleEmitters.settings.prompt-player.name',
-    hint: 'particleEmitters.settings.prompt-player.hint',
+    name: 'particle-pandemonium.settings.prompt-player.name',
+    hint: 'particle-pandemonium.settings.prompt-player.hint',
     scope: 'world',
     config: true,
     type: Boolean,

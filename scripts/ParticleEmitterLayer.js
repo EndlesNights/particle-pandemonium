@@ -9,6 +9,11 @@ const PARTICLE_EMITTER_LAYER_ZINDEX = 900
  */
 export class ParticleEmitterLayer extends PlaceablesLayer {
     /** @inheritdoc */
+    static get documentName() {
+        return 'ParticleEmitter';
+    }
+
+    /** @inheritdoc */
     static documentName = 'ParticleEmitter'
 
     /** @override */
@@ -39,23 +44,12 @@ export class ParticleEmitterLayer extends PlaceablesLayer {
     /** @override */
     _activate() {
         super._activate();
-        for (const p of this.placeables) p.renderFlags.set({ refreshField: true });
+        // for (const p of this.placeables) p.renderFlags.set({ refreshField: true });
     }
 
     /* -------------------------------------------- */
     /*    Event Listeners and Handlers              */
     /* -------------------------------------------- */
-
-    /** @inheritDoc */
-    _canDragLeftStart(user, event) {
-        // // Prevent creating a new light if currently previewing one.
-        // if (this.preview.children.length) {
-        //     ui.notifications.warn("CONTROLS.ObjectConfigured", { localize: true });
-        //     return false;
-        // }
-        // return super._canDragLeftStart(user, event);
-    }
-
 
     /** @override */
     _onClickLeft(event) {

@@ -1,16 +1,24 @@
 import { COLOR, PARTICLE_EMITTER_DEFAULTS } from './ParticleEmitterConfig.js'
 import { ParticleEmitterControlIcon } from './ParticleEmitterControlIcon.js'
+import { MODULE_ID } from './toolbar.js'
 
 /**
  * An ParticleEmitter is an implementation of PlaceableObject which represents a teleport between to points.
  * @extends {PlaceableObject}
  */
 export class ParticleEmitter extends PlaceableObject {
+
     /**
-     * A reference to the ControlIcon used to configure this particleEmitter
-     * @type {ParticleEmitterControlIcon}
+     * A reference to the PIXI.particles.Emitter
+     * @type {PIXI.particles.Emitter}
      */
-    // controlIcon
+    pixiEmitter;
+
+    /**
+     * A reference to the PIXI.ParticleContainer
+     * @type {PIXI.ParticleContainer}
+     */
+    particalContainer;
 
     /* -------------------------------------------- */
 
@@ -96,15 +104,20 @@ export class ParticleEmitter extends PlaceableObject {
 
     /** @override */
     async _draw() {
+
         // create containers
-        this.line = this.addChild(new PIXI.Graphics())
         this.controlIcon = this.addChild(new ParticleEmitterControlIcon({ texture: this.icon, width: this.width, height: this.height }))
 
         // Initial rendering
-        this.refresh()
+        // this.refresh()
         if (this.id) this.activateListeners()
-            
-        return this
+
+        this.initializeParticleEmitter();
+    }
+
+    /** @override */
+    _destroy(options) {
+        this.#destroyParticleEmitter();
     }
 
     /* -------------------------------------------- */
@@ -229,12 +242,13 @@ export class ParticleEmitter extends PlaceableObject {
     }
 
     /* -------------------------------------------- */
-    /*    Socket Listeners and Handlers                             */
+    /*    Socket Listeners and Handlers             */
     /* -------------------------------------------- */
 
     /** @override */
     _onCreate(...args) {
-        super._onCreate(...args)
+        super._onCreate(...args);
+        this.initializeParticleEmitter();
         // canvas.controls.createParticleEmitterControl(this)
 
         // const { targetScene, targetData } = this.target
@@ -260,11 +274,14 @@ export class ParticleEmitter extends PlaceableObject {
     _onUpdate(changed, options, userId) {
         super._onUpdate(changed, options, userId)
 
+        this.initializeParticleEmitter();
+
         this.renderFlags.set({
             refreshState: ("hidden" in changed) || (("config" in changed)),
             refreshElevation: "elevation" in changed
         });
 
+        //causing issues with the hide
     }
 
     /** @override */
@@ -305,6 +322,7 @@ export class ParticleEmitter extends PlaceableObject {
     _onClickRight(event) {
         this.document.update({ hidden: !this.document.hidden });
         if (!this._propagateRightClick(event)) event.stopPropagation();
+        this.updatePixiParticleEmitter();
     }
 
     /* -------------------------------------------- */
@@ -322,7 +340,7 @@ export class ParticleEmitter extends PlaceableObject {
     /** @inheritdoc */
     _onDragEnd() {
         super._onDragEnd();
-        if ( this.layer.active ) this.layer.draw();
+        if (this.layer.active) this.layer.draw();
     }
 
     /* -------------------------------------------- */
@@ -341,10 +359,114 @@ export class ParticleEmitter extends PlaceableObject {
      * @protected
      */
     _isParticleEmitterDisabled() {
-        const { hidden, config } = this.document;
+        const hidden = this.document.hidden;
         // Hidden ParticleEmitters are disabled
         if (hidden) return true;
 
+        if( !this.particleFunction) return true; // if no particle Function is loaded, it is hidden
         return false;
     }
+
+    /* -------------------------------------------- */
+    /*  Particle Emitter Management                 */
+    /* -------------------------------------------- */
+
+    /**
+     * Update the PIXI.particles.Emitter associated with this particles emitter object.
+     * @param {object} [options={}]               Options which modify how the emitter is updated
+     * @param {boolean} [options.deleted=false]   Indicate that this particle emitter has been deleted
+     */
+    initializeParticleEmitter({ deleted = false } = {}) {
+        console.log("initializeParticleEmitter");
+        const sourceId = this.sourceId;
+
+        const perceptionFlags = {
+            // refreshEdges: true,
+            // initializeVision: true,
+            // initializeLighting: true,
+            // refreshLighting: true,
+            refreshVision: true
+        };
+
+        // Remove the pixi particle Emitter from the active collection
+        if (deleted) {
+            if (!this.pixiEmitter?.active) return;
+            this.#destroyParticleEmitter();
+            canvas.perception.update(perceptionFlags);
+            return;
+        }
+
+        // Create the particle emitter if necessary
+        const particleEmitterFunction = this.getParticleFunction();
+        if (particleEmitterFunction) {
+            if (this.pixiEmitter) this.updatePixiParticleEmitter();
+            else this.#createPixiParticleEmitter();
+        }
+
+        // Assign perception and render flags
+        canvas.perception.update(perceptionFlags);
+        if (this.layer.active) this.renderFlags.set({ refreshField: true });
+    }
+
+    async getParticleFunction() {
+        const func = CONFIG[`${MODULE_ID}`]?.particleFunctionTypes[this.document.particleFunction]?.effectClass.prepareEmitterData(this.document);
+        return func;
+    }
+
+    /* -------------------------------------------- */
+
+    /**
+     * Returns a new PIXI.particles.Emitte
+     * @returns {PIXI.particles.Emitter} The created PIXI.particles.Emitter
+     */
+    async #createPixiParticleEmitter() {
+        //TODO
+
+        if(this.document.hidden) return; //Cna't create if hidden
+
+        // this.particalContainer ??= await this.#createPixiParticalContainer();
+        this.particalContainer ?? await this.#createPixiParticalContainer();
+
+
+        this.pixiEmitter = new PIXI.particles.Emitter(this.particalContainer, await this.getParticleFunction());
+    }
+
+    async updatePixiParticleEmitter() {
+        // console.log(this.pixiEmitter);
+        // await this.pixiEmitter.updateBehaviors(await this.getParticleFunction());
+        console.log(this.pixiEmitter)
+        if (this.pixiEmitter) this.destroyParticleEmitter();
+
+        if(this.document.hidden) return;
+
+        await this.#createPixiParticleEmitter();
+        // this.pixiEmitter = new PIXI.particles.Emitter(this.particalContainer, await this.getParticleFunction());
+    }
+
+    async destroyParticleEmitter() {
+        await this.pixiEmitter.destroy();
+        this.pixiEmitter = undefined;
+    }
+
+    /* -------------------------------------------- */
+
+    /**
+     * Returns a new PIXI.ParticleContainer, depending on the config data.
+     * @returns {PIXI.ParticleContainer} The created PIXI.ParticleContainer
+     */
+    async #createPixiParticalContainer() {
+        //TODO
+        this.particalContainer = new PIXI.ParticleContainer();
+        canvas.stage.addChild(this.particalContainer);
+    }
+
+    /* -------------------------------------------- */
+
+    /**
+     * Destroy the existing instance for this particle emitter.
+     */
+    #destroyParticleEmitter() {
+        //TODO
+    }
+
 }

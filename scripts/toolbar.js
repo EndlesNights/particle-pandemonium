@@ -1,4 +1,4 @@
-export const MODULE_ID = 'particleEmitter'
+export const MODULE_ID = 'particle-pandemonium'
 
 export const injectControls = (controls) => {
   // ParticleEmitter Layer Tools

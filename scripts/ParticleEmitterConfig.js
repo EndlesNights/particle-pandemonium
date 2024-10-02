@@ -1,4 +1,5 @@
 import { ParticleEmitterDocument } from './ParticleEmitterDocument.js'
+import { MODULE_ID } from './toolbar.js'
 
 export const PARTICLE_EMITTER_DEFAULTS = {
   scene: 'null',
@@ -28,11 +29,11 @@ export const COLOR = {
  */
 export class ParticleEmitterConfig extends DocumentSheet {
   /** @inheritdoc */
-  static get defaultOptions () {
+  static get defaultOptions() {
     return foundry.utils.mergeObject(super.defaultOptions, {
       id: 'particleEmitter-config',
       classes: ['sheet', 'particleEmitter-sheet'],
-      title: 'particleEmitters.ui.config.title',
+      title: 'particle-pandemonium.ui.config.title',
       template: 'modules/particle-pandemonium/templates/particle-emitter-config.html',
       width: 480,
       height: 'auto',
@@ -43,7 +44,7 @@ export class ParticleEmitterConfig extends DocumentSheet {
   /* -------------------------------------------- */
 
   /** @override */
-  async _render (force, options) {
+  async _render(force, options) {
     if (!this.rendered) this.original = this.object.clone({}, { keepId: true })
     return super._render(force, options)
   }
@@ -51,16 +52,16 @@ export class ParticleEmitterConfig extends DocumentSheet {
   /* -------------------------------------------- */
 
   /** @override */
-  getData (options) {
+  getData(options) {
     const data = super.getData(options)
     const scenes = {
-      null: game.i18n.localize('particleEmitters.ui.config.current-scene')
+      null: game.i18n.localize('particle-pandemonium.ui.config.current-scene')
     }
     for (const scene of game.scenes) {
       scenes[scene.id] = scene.name
     }
 
-    const iconName = (name) => game.i18n.localize(`particleEmitters.ui.config.icons.${name}`)
+    const iconName = (name) => game.i18n.localize(`particle-pandemonium.ui.config.icons.${name}`)
     const icons = {
       [PARTICLE_EMITTER_DEFAULTS.icon]: iconName('particleEmitter'),
       'icons/svg/door-steel.svg': iconName('door-steel'),
@@ -82,20 +83,38 @@ export class ParticleEmitterConfig extends DocumentSheet {
       data.data[key] ??= PARTICLE_EMITTER_DEFAULTS[key]
     }
 
+
+    data.particleFunctionTypes = this._getParticleFunctionTypes();
+    // this.checkFunctionHTML();
+    data.id = {};
+    if (this.object.particleFunction) { data.id[this.object.particleFunction] = true };
+    console.log(data.id)
     return {
       ...data,
       status: this.document.object.status,
       scenes,
       icons,
       fontFamilies,
-      submitText: game.i18n.localize('particleEmitters.ui.config.submit')
+      submitText: game.i18n.localize('particle-pandemonium.ui.config.submit')
     }
   }
 
   /* -------------------------------------------- */
 
+  _getParticleFunctionTypes() {
+    // data.particleFunctionTypes = CONFIG[`${MODULE_ID}`]?.particleFunctionTypes ?? {};
+
+    const types = {};
+    for (let [k, v] of Object.entries(CONFIG[`${MODULE_ID}`]?.particleFunctionTypes)) {
+      types[k] = game.i18n.localize(v.label);
+    }
+    return types;
+  }
+
+  /* -------------------------------------------- */
+
   /** @override */
-  activateListeners (html) {
+  activateListeners(html) {
     super.activateListeners(html)
     this.iconPicker = html.find('file-picker[name="icon"]')[0]
     html.find('img.select-icon').click(this._onSelectIcon.bind(this))
@@ -104,7 +123,7 @@ export class ParticleEmitterConfig extends DocumentSheet {
 
   /* -------------------------------------------- */
 
-  _onSelectIcon (event) {
+  _onSelectIcon(event) {
     const icon = event.currentTarget.attributes.src.value
     this.iconPicker.value = icon
     this.iconPicker.dispatchEvent(new Event('change', { bubbles: true }))
@@ -117,7 +136,7 @@ export class ParticleEmitterConfig extends DocumentSheet {
    * @param event
    * @private
    */
-  _onResetDefaults (event) {
+  _onResetDefaults(event) {
     event.preventDefault()
 
     const defaults = ParticleEmitterDocument.cleanData()
@@ -144,7 +163,7 @@ export class ParticleEmitterConfig extends DocumentSheet {
    * @param {object} change       Data which simulates a document update
    * @protected
    */
-  _previewChanges (change) {
+  _previewChanges(change) {
     this.object.updateSource(change)
     this.object._onUpdate(change, { render: false }, game.user.id)
   }
@@ -155,14 +174,14 @@ export class ParticleEmitterConfig extends DocumentSheet {
    * Restore the true data for the ParticleEmitter document when the form is submitted or closed.
    * @protected
    */
-  _resetPreview () {
+  _resetPreview() {
     this._previewChanges(this.original.toObject())
   }
 
   /* -------------------------------------------- */
 
   /** @inheritdoc */
-  async close (options = {}) {
+  async close(options = {}) {
     if (!options.force) this._resetPreview()
     return super.close(options)
   }
@@ -170,16 +189,19 @@ export class ParticleEmitterConfig extends DocumentSheet {
   /* -------------------------------------------- */
 
   /** @inheritdoc */
-  async _onChangeInput (event) {
+  async _onChangeInput(event) {
+
     await super._onChangeInput(event)
     const previewData = this._getSubmitData()
     this._previewChanges(previewData)
+
+    if(event.target.name === "particleFunction") this.checkFunctionHTML();
   }
 
   /* -------------------------------------------- */
 
   /** @override */
-  _getSubmitData (updateData = {}) {
+  _getSubmitData(updateData = {}) {
     const formData = super._getSubmitData(updateData)
 
     // replace default values with null
@@ -195,9 +217,29 @@ export class ParticleEmitterConfig extends DocumentSheet {
   /* -------------------------------------------- */
 
   /** @override */
-  async _updateObject (event, formData) {
+  async _updateObject(event, formData) {
     this._resetPreview()
     if (this.object.id) return this.object.update(formData)
     return this.object.constructor.create(formData, { parent: canvas.scene })
+  }
+
+  async checkFunctionHTML() {
+    this.clearFunctionHTML();
+    if (!this.object.particleFunction) return;
+
+    CONFIG[`${MODULE_ID}`]?.particleFunctionTypes[this.object.particleFunction].effectClass.addHTMLFeilds(this);
+    // this._element.style.height = 'auto';
+    this._element.css('height', 'auto');
+
+  }
+
+  clearFunctionHTML() {
+    const functionElement = this.form.querySelectorAll(`.function-elements`);
+    // Remove all child elements from each matched element
+    Array.from(functionElement).forEach((element) => {
+      while (element.firstChild) {
+        element.removeChild(element.firstChild);
+      }
+    });
   }
 }
