@@ -6,18 +6,18 @@
 
 export class ExampleClass {
 
-    defaultTexture() {
-        return "icons/anvil.png";
-    }
+    static defaultTexture = "icons/vtt.png";
+    static particlesPerWave = 6;
+    static scale = 1;
+    static moveSpeed = 1;
 
     static addHTMLFeilds(element) {
         const doc = element.object;
-        console.log("Add HTML");
-        console.log(element);
 
-        console.log(doc)
-        console.log(doc.flags)
-        let textureSRC = doc.flags?.["particle-pandemonium"]?.texture.src ?? this.defaultTexture();
+        let textureSRC = doc.flags?.["particle-pandemonium"]?.texture.src ?? ExampleClass.defaultTexture;
+        let particlesPerWave = doc.flags?.["particle-pandemonium"]?.particlesPerWave ?? ExampleClass.particlesPerWave;
+        let scale = doc.flags?.["particle-pandemonium"]?.scale ?? ExampleClass.scale;
+        let moveSpeed = doc.flags?.["particle-pandemonium"]?.moveSpeed ?? ExampleClass.moveSpeed;
 
         // let textureSRC = doc.flags["particle-pandemonium"]?.texture?.src || "icons/anvil.png";
         const html = `
@@ -26,22 +26,37 @@ export class ExampleClass {
             <div class="form-fields">
                 <file-picker value="${textureSRC}" name="flags.particle-pandemonium.texture.src" type="imagevideo"><input class="image" type="text" placeholder="path/to/file.ext"><button class="fa-solid fa-file-import fa-fw" type="button" data-tooltip="Browse Files" aria-label="Browse Files" tabindex="-1"></button></file-picker>
             </div>
-        </div>`;
+        </div>
+        
+       <div class="form-group">
+            <label>Particles Per Wave</label>
+            <input type="number" value="${particlesPerWave}" name="flags.particle-pandemonium.particlesPerWave" placeholder="6"  data-dtype="Number" />
+        </div>      
+
+       <div class="form-group">
+            <label>Image Scale</label>
+            <input type="number" value="${scale}" name="flags.particle-pandemonium.scale" placeholder="1" step="0.01" data-dtype="Number" />
+        </div>
+
+       <div class="form-group">
+            <label>Movement Speed</label>
+            <input type="number" value="${moveSpeed}" name="flags.particle-pandemonium.moveSpeed" placeholder="1" step="0.01" data-dtype="Number" />
+        </div>
+        `;
 
         element.form.querySelector(`.function-elements`).innerHTML = html;
     }
 
     static async prepareEmitterData(document) {
-        const texture = document.flags?.["particle-pandemonium"]?.texture.src ?? this.defaultTexture();
+        const texture = document.flags?.["particle-pandemonium"]?.texture.src ?? ExampleClass.defaultTexture;
         // const randomLeaf = Math.floor(Math.random() * 6) + 1;
-        console.log(document)
         const func = {
             lifetime: { min: 3, max: 3 },
             frequency: 1,
             spawnChance: 1,
-            particlesPerWave: 6,
+            particlesPerWave: document.flags?.["particle-pandemonium"]?.particlesPerWave ?? ExampleClass.particlesPerWave,
             // emitterLifetime: 2.5,
-            maxParticles: 10,
+            maxParticles: 100,
             pos: {x:document.x, y:document.y},
             autoUpdate: true,
             behaviors: [
@@ -59,7 +74,7 @@ export class ExampleClass {
                         speed: {
                             list: [{ time: 1, value: 20 }, { time: 1, value: 60 }]
                         },
-                        minMult: 0.6
+                        minMult: 0.6 * (document.flags?.["particle-pandemonium"]?.moveSpeed ?? ExampleClass.moveSpeed)
                     }
                 },
                 {
@@ -68,7 +83,7 @@ export class ExampleClass {
                         scale: {
                             list: [{ time: 1, value: 0.2 }, { time: 1, value: 0.4 }]
                         },
-                        minMult: 0.5
+                        minMult: 0.5 * (document.flags?.["particle-pandemonium"]?.scale ?? ExampleClass.scale)
                     }
                 },
                 {
@@ -87,12 +102,5 @@ export class ExampleClass {
 
 Hooks.on("renderParticleEmitterConfig", (app, html, data) => {
     if (app.object.particleFunction !== "example") return;
-
-    console.log(app)
-    console.log(html)
-    console.log(data)
-
     app.checkFunctionHTML();
 });
-
-

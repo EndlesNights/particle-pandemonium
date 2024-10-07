@@ -39,6 +39,14 @@ export class ParticleEmitter extends PlaceableObject {
         }
     }
 
+    /* -------------------------------------------- */
+
+    /** @override */
+    get sourceId() {
+        let id = `${this.document.documentName}.${this.document.id}`;
+        if (this.isPreview) id += ".preview";
+        return id;
+    }
 
     get icon() {
         return this.document.icon || PARTICLE_EMITTER_DEFAULTS.icon
@@ -115,9 +123,13 @@ export class ParticleEmitter extends PlaceableObject {
         this.initializeParticleEmitter();
     }
 
+
+    /* -------------------------------------------- */
+
     /** @override */
-    _destroy(options) {
+    _destroy(...args) {
         this.#destroyParticleEmitter();
+        super._destroy(...args)
     }
 
     /* -------------------------------------------- */
@@ -233,13 +245,6 @@ export class ParticleEmitter extends PlaceableObject {
     }
 
 
-    /* -------------------------------------------- */
-
-    /** @override */
-    _destroy(...args) {
-        if (this.particleEmitterControl) this.particleEmitterControl.destroy({ children: true })
-        super._destroy(...args)
-    }
 
     /* -------------------------------------------- */
     /*    Socket Listeners and Handlers             */
@@ -339,6 +344,7 @@ export class ParticleEmitter extends PlaceableObject {
 
     /** @inheritdoc */
     _onDragEnd() {
+        // if(this.isVisible) this.#destroyParticleEmitter();
         super._onDragEnd();
         if (this.layer.active) this.layer.draw();
     }
@@ -363,7 +369,7 @@ export class ParticleEmitter extends PlaceableObject {
         // Hidden ParticleEmitters are disabled
         if (hidden) return true;
 
-        if( !this.particleFunction) return true; // if no particle Function is loaded, it is hidden
+        if (!this.particleFunction) return true; // if no particle Function is loaded, it is hidden
         return false;
     }
 
@@ -377,7 +383,6 @@ export class ParticleEmitter extends PlaceableObject {
      * @param {boolean} [options.deleted=false]   Indicate that this particle emitter has been deleted
      */
     initializeParticleEmitter({ deleted = false } = {}) {
-        console.log("initializeParticleEmitter");
         const sourceId = this.sourceId;
 
         const perceptionFlags = {
@@ -399,8 +404,11 @@ export class ParticleEmitter extends PlaceableObject {
         // Create the particle emitter if necessary
         const particleEmitterFunction = this.getParticleFunction();
         if (particleEmitterFunction) {
-            if (this.pixiEmitter) this.updatePixiParticleEmitter();
-            else this.#createPixiParticleEmitter();
+            if (this.isPreview) return // Don't create for preveiw
+            if (this.pixiEmitter){ this.updatePixiParticleEmitter();}
+            else {this.#createPixiParticleEmitter();}
+        } else {
+            this.#destroyParticleEmitter()
         }
 
         // Assign perception and render flags
@@ -420,32 +428,23 @@ export class ParticleEmitter extends PlaceableObject {
      * @returns {PIXI.particles.Emitter} The created PIXI.particles.Emitter
      */
     async #createPixiParticleEmitter() {
-        //TODO
-
-        if(this.document.hidden) return; //Cna't create if hidden
+        if (this.document.hidden) return; //Can't create if hidden
 
         // this.particalContainer ??= await this.#createPixiParticalContainer();
-        this.particalContainer ?? await this.#createPixiParticalContainer();
+        if(!this.particalContainer) await this.#createPixiParticalContainer();
 
 
         this.pixiEmitter = new PIXI.particles.Emitter(this.particalContainer, await this.getParticleFunction());
     }
 
     async updatePixiParticleEmitter() {
-        // console.log(this.pixiEmitter);
         // await this.pixiEmitter.updateBehaviors(await this.getParticleFunction());
-        console.log(this.pixiEmitter)
-        if (this.pixiEmitter) this.destroyParticleEmitter();
+        if (this.pixiEmitter) await this.#destroyParticleEmitter();
 
-        if(this.document.hidden) return;
+        if (this.document.hidden) return;
 
         await this.#createPixiParticleEmitter();
         // this.pixiEmitter = new PIXI.particles.Emitter(this.particalContainer, await this.getParticleFunction());
-    }
-
-    async destroyParticleEmitter() {
-        await this.pixiEmitter.destroy();
-        this.pixiEmitter = undefined;
     }
 
     /* -------------------------------------------- */
@@ -456,8 +455,13 @@ export class ParticleEmitter extends PlaceableObject {
      */
     async #createPixiParticalContainer() {
         //TODO
-        this.particalContainer = new PIXI.ParticleContainer();
-        canvas.stage.addChild(this.particalContainer);
+        this.particalContainer = await new PIXI.ParticleContainer();
+
+        if(this.document.alwaysRender){ //Check if the particles should been seen through fog of war or not
+            canvas.rendered.addChild(this.particalContainer);
+        } else {
+            canvas.primary.addChild(this.particalContainer);
+        }
     }
 
     /* -------------------------------------------- */
@@ -466,7 +470,16 @@ export class ParticleEmitter extends PlaceableObject {
      * Destroy the existing instance for this particle emitter.
      */
     #destroyParticleEmitter() {
-        //TODO
+        if(this.pixiEmitter){
+            this.pixiEmitter.destroy();
+            this.pixiEmitter = undefined;
+        }
+
+        if(this.particalContainer){
+            this.particalContainer.destroy();
+            this.particalContainer = undefined;
+        }
+
     }
 
 }

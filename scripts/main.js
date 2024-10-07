@@ -29,7 +29,7 @@ Hooks.once('init', () => {
         id: "example",
         label: "Example Function",
         effectClass: ExampleClass
-    }
+    };
 })
 
 Hooks.on('setup', async () => {
@@ -37,11 +37,8 @@ Hooks.on('setup', async () => {
     hookModifyDocument()
 
     // handle own events
-    console.log(MODULE_ID)
     game.socket.on(`module.${MODULE_ID}`, (message) => {
-        console.log("Socket")
         const { eventName, data } = message
-
         if (eventName === 'modifyDocument') {
             handleModifyEmbeddedDocument(data)
         } else {
@@ -72,9 +69,3 @@ Hooks.on('getSceneControlButtons', (controls) => {
 
 Hooks.on(`paste${ParticleEmitter.embeddedName}`, ParticleEmitterLayer.onPasteParticleEmitter)
 
-// Hooks.on('renderModuleManagement', async (moduleManagement, html) => {
-//     if (!game.modules.get('module-credits')?.active) {
-//         const tags = await renderTemplate('modules/particle-pandemonium/templates/module-management-tags.hbs')
-//         html.find('li[data-module-name="particleEmitters"] .package-overview .package-title').after(tags)
-//     }
-// })

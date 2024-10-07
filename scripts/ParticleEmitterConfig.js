@@ -3,7 +3,7 @@ import { MODULE_ID } from './toolbar.js'
 
 export const PARTICLE_EMITTER_DEFAULTS = {
   scene: 'null',
-  icon: 'icons/svg/explosion.svg',
+  icon: 'modules/particle-pandemonium/assets/svg/cauldron.svg', //'icons/svg/explosion.svg',
   width: 0.4,
   height: 0.4,
   fontFamily: CONFIG.defaultFontFamily,
@@ -88,7 +88,6 @@ export class ParticleEmitterConfig extends DocumentSheet {
     // this.checkFunctionHTML();
     data.id = {};
     if (this.object.particleFunction) { data.id[this.object.particleFunction] = true };
-    console.log(data.id)
     return {
       ...data,
       status: this.document.object.status,

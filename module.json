@@ -16,6 +16,7 @@
       "flags": {}
     }
   ],
+  "socket": true,
   "esmodules":["scripts/main.js"],
   "url": "https://github.com/EndlesNights/particle-pandemonium",
   "manifest": "https://raw.githubusercontent.com/EndlesNights/particle-pandemonium/main/module.json",
