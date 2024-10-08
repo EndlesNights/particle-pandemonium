@@ -1,8 +1,3 @@
-// CONFIG[`${MODULE_ID}`].particleFunctionTypes.example = {
-//     id:"example",
-//     label: "Example Function",
-//     effectClass: ExampleClass
-// }
 
 export class ExampleClass {
 
@@ -47,7 +42,7 @@ export class ExampleClass {
         element.form.querySelector(`.function-elements`).innerHTML = html;
     }
 
-    static async prepareEmitterData(document) {
+    async prepareEmitterData(document) {
         const texture = document.flags?.["particle-pandemonium"]?.texture.src ?? ExampleClass.defaultTexture;
         // const randomLeaf = Math.floor(Math.random() * 6) + 1;
         const func = {

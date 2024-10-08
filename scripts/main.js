@@ -8,6 +8,8 @@ import { registerSettings, MODULE_ID } from './settings.js'
 import { ParticleEmitter } from './ParticleEmitter.js'
 import { ParticleEmitterLayer } from './ParticleEmitterLayer.js'
 import { ExampleClass } from './particle-effects/example-dispersion.js';
+import { Gas } from './particle-effects/gas.js';
+import { Bubble } from './particle-effects/bubbles.js';
 
 
 Hooks.once('init', () => {
@@ -17,19 +19,8 @@ Hooks.once('init', () => {
     // inject particleEmitter layer / embedded document in hardcoded places
     injectParticleEmitters()
 
-    if (!CONFIG[`${MODULE_ID}`]) {
-        CONFIG[`${MODULE_ID}`] = {};
-    }
+    registerParticleEffectFunctions();
 
-    if (!CONFIG[`${MODULE_ID}`].particleFunctionTypes) {
-        CONFIG[`${MODULE_ID}`].particleFunctionTypes = {};
-    }
-
-    CONFIG[`${MODULE_ID}`].particleFunctionTypes.example = {
-        id: "example",
-        label: "Example Function",
-        effectClass: ExampleClass
-    };
 })
 
 Hooks.on('setup', async () => {
@@ -69,3 +60,31 @@ Hooks.on('getSceneControlButtons', (controls) => {
 
 Hooks.on(`paste${ParticleEmitter.embeddedName}`, ParticleEmitterLayer.onPasteParticleEmitter)
 
+function registerParticleEffectFunctions(){
+    //create the CONFIG object for holding the function
+    if (!CONFIG[`${MODULE_ID}`]) {
+        CONFIG[`${MODULE_ID}`] = {};
+    }
+
+    if (!CONFIG[`${MODULE_ID}`].particleFunctionTypes) {
+        CONFIG[`${MODULE_ID}`].particleFunctionTypes = {};
+    }
+
+    CONFIG[`${MODULE_ID}`].particleFunctionTypes.example = {
+        id: "example",
+        label: "Example Function",
+        effectClass: ExampleClass
+    };
+
+    CONFIG[`${MODULE_ID}`].particleFunctionTypes.gas = {
+        id: "gas",
+        label: "Gas Function",
+        effectClass: Gas
+    };
+
+    CONFIG[`${MODULE_ID}`].particleFunctionTypes.bubble = {
+        id: "bubble",
+        label: "Bubble Function",
+        effectClass: Bubble
+    };
+};
