@@ -60,7 +60,7 @@ export class ExampleClass {
                     type: "alpha",
                     config: {
                         alpha: {
-                            list: [{ time: 1, value: 0.9 }, { time: 1, value: 0.5 }]
+                            list: [{ time: 0, value: 1 }, { time: 1, value: 0.02 }]
                         }
                     }
                 },
@@ -84,7 +84,7 @@ export class ExampleClass {
                 },
                 {
                     type: "rotation",
-                    config: { accel: 0, minSpeed: 100, maxSpeed: 200, minStart: 0, maxStart: 365 }
+                    config: { accel: 0, minSpeed: 0, maxSpeed: 10, minStart: 0, maxStart: 360 }
                 },
                 {
                     type: 'textureSingle',

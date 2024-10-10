@@ -46,14 +46,14 @@ export class Bubble {
 	async prepareEmitterData(document) {
 		const randomLeaf = Math.floor(Math.random() * 6) + 1;
 		let images = [
-			"ui/particles/leaf1.png",
-			"ui/particles/leaf2.png",
-			"ui/particles/leaf3.png",
-			"ui/particles/leaf4.png",
-			// "modules/particle-pandemonium/assets/images/Bubbles99.png",
-			// "modules/particle-pandemonium/assets/images/Pop1.png",
-			// "modules/particle-pandemonium/assets/images/Pop2.png",
-			// "modules/particle-pandemonium/assets/images/Pop3.png",
+			// "ui/particles/leaf1.png",
+			// "ui/particles/leaf2.png",
+			// "ui/particles/leaf3.png",
+			// "ui/particles/leaf4.png",
+			"modules/particle-pandemonium/assets/images/Bubbles99.png",
+			"modules/particle-pandemonium/assets/images/Pop1.png",
+			"modules/particle-pandemonium/assets/images/Pop2.png",
+			"modules/particle-pandemonium/assets/images/Pop3.png",
 		];
 		let textureArray = [];
 		for (let i = 0; i < 4; i++) {
@@ -70,8 +70,8 @@ export class Bubble {
 		console.log(animatedSprite)
 		const func = {
 			"lifetime": {
-				"min": 3,
-				"max": 4
+				"min": 2,
+				"max": 3
 			},
 			"frequency": 0.1, //0.056,
 			// "emitterLifetime": 5,
@@ -114,45 +114,47 @@ export class Bubble {
 						}
 					}
 				},
-				// {
-				// 	"type": "scale",
-				// 	"config": {
-				// 		"scale": {
-				// 			"list": [
-				// 				{
-				// 					"time": 0,
-				// 					"value": 0.25
-				// 				},
-				// 				{
-				// 					"time": 1,
-				// 					"value": 0.75
-				// 				}
-				// 			]
-				// 		},
-				// 		"minMult": 0.5
-				// 	}
-				// },
+				{
+					"type": "scale",
+					"config": {
+						"scale": {
+							"list": [
+								{
+									"time": 0,
+									"value": 0.25
+								},
+								{
+									"time": 1,
+									"value": 0.75
+								}
+							]
+						},
+						"minMult": 0.5
+					}
+				},
 				{
 					"type": "rotation",
 					"config": {
 						"accel": 0,
 						"minSpeed": 0,
-						"maxSpeed": 10,
+						"maxSpeed": 50,
 						"minStart": 0,
 						"maxStart": 360
 					}
 				},
 				{
-					type: "textureRandom",
+					type: "animatedSingle",
 					config: {
-						textures: //images
-							[
-								"ui/particles/leaf1.png",
-								"ui/particles/leaf2.png",
-								"ui/particles/leaf3.png",
-								"ui/particles/leaf4.png",
+						anim: {
+							framerate: -1,
+							textures:[
+								{texture: "modules/particle-pandemonium/assets/images/Bubbles99.png", count: 80},
+								{texture: "modules/particle-pandemonium/assets/images/Pop1.png", count: 0.5},
+								{texture: "modules/particle-pandemonium/assets/images/Pop2.png", count: 0.5},
+								{texture: "modules/particle-pandemonium/assets/images/Pop3.png", count: 0.5},
 							],
-						random: true
+						}
+
 					}
 				},
 
