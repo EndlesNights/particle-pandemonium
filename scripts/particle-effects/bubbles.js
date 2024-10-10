@@ -5,6 +5,7 @@ export class Bubble {
 	// static particlesPerWave = 6;
 	// static scale = 1;
 	// static moveSpeed = 1;
+	imagePaths = [];
 
 	static addHTMLFeilds(element) {
 		// 	const doc = element.object;
@@ -72,7 +73,7 @@ export class Bubble {
 				"min": 3,
 				"max": 4
 			},
-			"frequency": 1, //0.056,
+			"frequency": 0.1, //0.056,
 			// "emitterLifetime": 5,
 			"maxParticles": 500,
 			// "addAtBack": false,
@@ -150,7 +151,8 @@ export class Bubble {
 								"ui/particles/leaf2.png",
 								"ui/particles/leaf3.png",
 								"ui/particles/leaf4.png",
-							]
+							],
+						random: true
 					}
 				},
 

@@ -5,6 +5,7 @@ export class ExampleClass {
     static particlesPerWave = 6;
     static scale = 1;
     static moveSpeed = 1;
+    imagePaths = [];
 
     static addHTMLFeilds(element) {
         const doc = element.object;
@@ -46,14 +47,14 @@ export class ExampleClass {
         const texture = document.flags?.["particle-pandemonium"]?.texture.src ?? ExampleClass.defaultTexture;
         // const randomLeaf = Math.floor(Math.random() * 6) + 1;
         const func = {
-            lifetime: { min: 3, max: 3 },
-            frequency: 1,
-            spawnChance: 1,
+            lifetime: { min: 3, max: 4 },
+            frequency: 0.056,
+            // spawnChance: 1,
             particlesPerWave: document.flags?.["particle-pandemonium"]?.particlesPerWave ?? ExampleClass.particlesPerWave,
             // emitterLifetime: 2.5,
-            maxParticles: 100,
+            maxParticles: 500,
             pos: {x:document.x, y:document.y},
-            autoUpdate: true,
+            // autoUpdate: true,
             behaviors: [
                 {
                     type: "alpha",

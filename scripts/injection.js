@@ -50,21 +50,28 @@ export const injectParticleEmitters = () => {
 }
 
 const hookCanvas = () => {
-  // inject ParticleEmitterLayer into the canvas layers list
-  const origLayers = CONFIG.Canvas.layers
-  CONFIG.Canvas.layers = Object.keys(origLayers).reduce((layers, key, i) => {
-    layers[key] = origLayers[key]
 
-    // inject particleEmitters layer after walls
-    if (key === 'walls') {
-      layers.particleEmitters = {
-        layerClass: ParticleEmitterLayer,
-        group: 'interface'
-      }
+  CONFIG.Canvas.layers = foundry.utils.mergeObject(Canvas.layers, {
+    particleEmitters: {
+      layerClass: ParticleEmitterLayer,
+      group: 'interface'
     }
+  });
+  // inject ParticleEmitterLayer into the canvas layers list
+  // const origLayers = CONFIG.Canvas.layers
+  // CONFIG.Canvas.layers = Object.keys(origLayers).reduce((layers, key, i) => {
+  //   layers[key] = origLayers[key]
 
-    return layers
-  }, {})
+  //   // inject particleEmitters layer after walls
+  //   if (key === 'walls') {
+  //     layers.particleEmitters = {
+  //       layerClass: ParticleEmitterLayer,
+  //       group: 'interface'
+  //     }
+  //   }
+    
+  //   return layers
+  // }, {})
 
   // FIXME: workaround for #23
   if (!Object.is(Canvas.layers, CONFIG.Canvas.layers)) {

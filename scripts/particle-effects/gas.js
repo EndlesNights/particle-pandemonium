@@ -5,6 +5,7 @@ export class Gas {
     static particlesPerWave = 6;
     static scale = 1;
     static moveSpeed = 1;
+    imagePaths = ["modules/particle-pandemonium/assets/images/smokeparticle.png", "modules/particle-pandemonium/assets/images/particle.png"];
 
     static addHTMLFeilds(element) {
         const doc = element.object;
@@ -43,18 +44,30 @@ export class Gas {
     }
 
     async prepareEmitterData(document) {
+        // let imagePaths = ["modules/particle-pandemonium/assets/images/smokeparticle.png", "modules/particle-pandemonium/assets/images/particle.png"];
+        // let urls = imagePaths.slice();
+        // console.log(urls)
+
+        // const loader = PIXI.Assets;
+        // const assetPromises = urls.map((url, i) => {
+        //     return loader.load(url).then(texture => ({ key: 'img' + i, texture }));
+        // });
+
+        // Promise.all(assetPromises).then((assets) => {
+
+        // });
 
         const func = {
             lifetime: {
                 min: 2,
                 max: 1.8
             },
-            frequency: 0.1,
+            frequency: 0.01,
             emitterLifetime: 0,
             maxParticles: 1000,
             addAtBack: true,
             pos: {x:document.x, y:document.y},
-            autoUpdate: true,
+            // autoUpdate: true,
             behaviors: [
                 {
                     type: "alpha",
@@ -132,8 +145,8 @@ export class Gas {
                     type: "textureRandom",
                     config: {
                         textures: [
-                            "modules/particle-pandemonium/assets/images/smokeparticle.png",
-                            "modules/particle-pandemonium/assets/images/particle.png"
+                            this.imagePaths[0],
+                            this.imagePaths[1]
                         ]
                     }
                 },

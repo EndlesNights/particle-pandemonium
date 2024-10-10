@@ -20,6 +20,10 @@ export class ParticleEmitter extends PlaceableObject {
      */
     particalContainer;
 
+    elapsed = Date.now();
+    updateFrameId = null;
+    renderer;
+
     /* -------------------------------------------- */
 
     /** @inheritdoc */
@@ -324,9 +328,9 @@ export class ParticleEmitter extends PlaceableObject {
     /* -------------------------------------------- */
 
     /** @inheritdoc */
-    _onClickRight(event) {
-        this.document.update({ hidden: !this.document.hidden });
+    async _onClickRight(event) {
         if (!this._propagateRightClick(event)) event.stopPropagation();
+        await this.document.update({ hidden: !this.document.hidden });
         this.updatePixiParticleEmitter();
     }
 
@@ -416,11 +420,16 @@ export class ParticleEmitter extends PlaceableObject {
         if (this.layer.active) this.renderFlags.set({ refreshField: true });
     }
 
-    async getParticleFunction() {
+    getParticleClass(){
+        if (!this.document.particleFunction) return;
+        return new CONFIG[`${MODULE_ID}`].particleFunctionTypes[this.document.particleFunction].effectClass();
+    }
+
+    getParticleFunction() {
         if (!this.document.particleFunction) return;
         const particleClass = new CONFIG[`${MODULE_ID}`].particleFunctionTypes[this.document.particleFunction].effectClass();
         // const func = CONFIG[`${MODULE_ID}`]?.particleFunctionTypes[this.document.particleFunction]?.effectClass.prepareEmitterData(this.document);
-        const func = particleClass.prepareEmitterData(this.document);
+        const func = this.getParticleClass().prepareEmitterData(this.document);
 
         return func;
     }
@@ -432,38 +441,34 @@ export class ParticleEmitter extends PlaceableObject {
      * @returns {PIXI.particles.Emitter} The created PIXI.particles.Emitter
      */
     async #createPixiParticleEmitter() {
-        if (this.document.hidden) return; //Can't create if hidden
+        if (await this.document.hidden) return; //Do Not create if hidden
 
-        // this.particalContainer ??= await this.#createPixiParticalContainer();
+        const particleFunction = await this.getParticleFunction();
+        if(!particleFunction) return; //Stop everything else if no function;
         if (!this.particalContainer) await this.#createPixiParticalContainer();
 
+        if(!this.renderer){
+            this.renderer = new PIXI.Renderer({veiw: document.getElementById('board')});
+        }
 
-        // this.pixiEmitter = new PIXI.particles.Emitter(this.particalContainer, await this.getParticleFunction());
-        this.pixiEmitter = new PIXI.particles.Emitter(this.particalContainer, await this.getParticleFunction());
+        // let urls;
+        // urls = this.getParticleClass().imagePaths.slice();
+        // const loader = PIXI.Assets;
 
-        var emitter = this.pixiEmitter;
-        // Calculate the current time
-        var elapsed = Date.now();
+        // const assetPromises = urls.map((url, i) => {
+        //     return loader.load(url).then(texture => ({ key: 'img' + i, texture }));
+        // });
+        // console.log(assetPromises)
 
-        // Update function every frame
-        var update = function(){
+        // Promise.all(assetPromises).then((assets) => {
+        //     console.log(assets);
+        //     this.pixiEmitter = new PIXI.particles.Emitter(this.particalContainer, particleFunction);
 
-            // Update the next frame
-            requestAnimationFrame(update);
-
-            var now = Date.now();
-
-            // The emitter requires the elapsed
-            // number of seconds since the last update
-            emitter.update((now - elapsed) * 0.001);
-            elapsed = now;
-        };
-
-        // Start emitting
-        this.pixiEmitter.emit = true;
-
-        // Start the update
-        update();
+        //     this.update();
+        // });
+        
+        this.pixiEmitter = new PIXI.particles.Emitter(this.particalContainer, await particleFunction);
+        this.update();
     }
 
     async updatePixiParticleEmitter() {
@@ -484,13 +489,18 @@ export class ParticleEmitter extends PlaceableObject {
      */
     async #createPixiParticalContainer() {
         //TODO
-        this.particalContainer = await new PIXI.ParticleContainer();
+        // this.particalContainer = await new PIXI.ParticleContainer();
+        this.particalContainer = await new PIXI.Container();
 
+        let layer;
         if (this.document.alwaysRender) { //Check if the particles should been seen through fog of war or not
-            canvas.rendered.addChild(this.particalContainer);
+            layer = canvas.rendered;
         } else {
-            canvas.primary.addChild(this.particalContainer);
+            layer = canvas.primary; 
         }
+
+        layer.addChild(this.particalContainer);
+        layer.sortChildren();
     }
 
     /* -------------------------------------------- */
@@ -511,4 +521,20 @@ export class ParticleEmitter extends PlaceableObject {
 
     }
 
+
+    update = () => {
+        this.updateFrameId = requestAnimationFrame(this.update);
+        const now = Date.now();
+
+        if(this.pixiEmitter){
+            this.pixiEmitter.update((now - this.elapsed) * 0.001);
+        }
+
+        // if(this.updateHook){
+
+        // }
+        this.elapsed = now;
+
+        this.renderer.render(canvas.primary);
+    }
 }
