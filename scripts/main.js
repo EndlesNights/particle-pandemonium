@@ -84,7 +84,7 @@ function registerParticleEffectFunctions(){
 
     CONFIG[`${MODULE_ID}`].particleFunctionTypes.bubble = {
         id: "bubble",
-        label: "Bubble Function",
+        label: "Bubble Animation Function",
         effectClass: Bubble
     };
 };
