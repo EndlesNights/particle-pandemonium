@@ -103,18 +103,24 @@ export class ExampleClass {
                     type: "moveSpeed",
                     config: {
                         speed: {
-                            list: [{ time: 1, value: 20 }, { time: 1, value: 60 }]
+                            list: [
+                                { time: 1, value: 20 * (document.flags?.["particle-pandemonium"]?.moveSpeed ?? ExampleClass.moveSpeed) },
+                                { time: 1, value: 60 * (document.flags?.["particle-pandemonium"]?.moveSpeed ?? ExampleClass.moveSpeed) }
+                            ]
                         },
-                        minMult: 0.6 * (document.flags?.["particle-pandemonium"]?.moveSpeed ?? ExampleClass.moveSpeed)
+                        minMult: 0.6
                     }
                 },
                 {
                     type: "scale",
                     config: {
                         scale: {
-                            list: [{ time: 1, value: 0.2 }, { time: 1, value: 0.4 }]
+                            list: [
+                                { time: 1, value: 0.2 * (document.flags?.["particle-pandemonium"]?.scale ?? ExampleClass.scale) },
+                                { time: 1, value: 0.4 * (document.flags?.["particle-pandemonium"]?.scale ?? ExampleClass.scale) }
+                            ]
                         },
-                        minMult: 0.5 * (document.flags?.["particle-pandemonium"]?.scale ?? ExampleClass.scale)
+                        minMult: 0.5
                     }
                 },
                 {
