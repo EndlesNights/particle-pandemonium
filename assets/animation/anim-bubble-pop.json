@@ -1,0 +1,9 @@
+{
+	"framerate": -1,
+	"textures":[
+		{"texture": "modules/particle-pandemonium/assets/images/Bubbles99.png", "count": 80},
+		{"texture": "modules/particle-pandemonium/assets/images/Pop1.png", "count": 1},
+		{"texture": "modules/particle-pandemonium/assets/images/Pop2.png", "count": 1},
+		{"texture": "modules/particle-pandemonium/assets/images/Pop3.png", "count": 1}
+	]
+}
