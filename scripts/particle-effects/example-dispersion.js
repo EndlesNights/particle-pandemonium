@@ -3,19 +3,25 @@ export class ExampleClass {
 
     static defaultTexture = "icons/vtt.png";
     static particlesPerWave = 6;
+    static particlesMax = 500;
     static scale = 1;
     static moveSpeed = 1;
-    imagePaths = [];
+    static frequencyMultiplier = 1;
+    static lifetimeMin = 3;
+    static lifetimeMax = 4;
 
     static addHTMLFeilds(element) {
         const doc = element.object;
 
         let textureSRC = doc.flags?.["particle-pandemonium"]?.texture.src ?? ExampleClass.defaultTexture;
         let particlesPerWave = doc.flags?.["particle-pandemonium"]?.particlesPerWave ?? ExampleClass.particlesPerWave;
+        let particlesMax = doc.flags?.["particle-pandemonium"]?.particlesMax ?? ExampleClass.particlesMax;
         let scale = doc.flags?.["particle-pandemonium"]?.scale ?? ExampleClass.scale;
         let moveSpeed = doc.flags?.["particle-pandemonium"]?.moveSpeed ?? ExampleClass.moveSpeed;
+        let frequencyMultiplier = doc.flags?.["particle-pandemonium"]?.frequencyMultiplier ?? ExampleClass.frequencyMultiplier;
+        let lifetimeMin = doc.flags?.["particle-pandemonium"]?.lifetimeMin ?? ExampleClass.lifetimeMin;
+        let lifetimeMax = doc.flags?.["particle-pandemonium"]?.lifetimeMax ?? ExampleClass.lifetimeMax;
 
-        // let textureSRC = doc.flags["particle-pandemonium"]?.texture?.src || "icons/anvil.png";
         const html = `
        <div class="form-group">
             <label>Texture Image</label>
@@ -23,20 +29,50 @@ export class ExampleClass {
                 <file-picker value="${textureSRC}" name="flags.particle-pandemonium.texture.src" type="imagevideo"><input class="image" type="text" placeholder="path/to/file.ext"><button class="fa-solid fa-file-import fa-fw" type="button" data-tooltip="Browse Files" aria-label="Browse Files" tabindex="-1"></button></file-picker>
             </div>
         </div>
-        
-       <div class="form-group">
-            <label>Particles Per Wave</label>
-            <input type="number" value="${particlesPerWave}" name="flags.particle-pandemonium.particlesPerWave" placeholder="6"  data-dtype="Number" />
-        </div>      
 
-       <div class="form-group">
-            <label>Image Scale</label>
-            <input type="number" value="${scale}" name="flags.particle-pandemonium.scale" placeholder="1" step="0.01" data-dtype="Number" />
+        <div class="form-group slim">
+            <label>Lifetime</label>
+                <div class="form-fields">
+                    <label>Min</label>
+                    <input type="number" value="${lifetimeMin}" name="flags.particle-pandemonium.lifetimeMin" placeholder="3" step="0.01" data-dtype="Number" />
+                    <label>Max</label>
+                    <input type="number" value="${lifetimeMax}" name="flags.particle-pandemonium.lifetimeMax" placeholder="4" step="0.01" data-dtype="Number" />
+                </div>
         </div>
 
-       <div class="form-group">
-            <label>Movement Speed</label>
-            <input type="number" value="${moveSpeed}" name="flags.particle-pandemonium.moveSpeed" placeholder="1" step="0.01" data-dtype="Number" />
+       <div class="form-group slim">
+            <label>Frequency Multiplier</label>
+            <div class="form-fields">
+                <input type="number" value="${frequencyMultiplier}" name="flags.particle-pandemonium.frequencyMultiplier" placeholder="1" step="0.01" data-dtype="Number" />
+                </div>
+        </div>
+
+        <div class="form-group slim">
+            <label>Particles Per Wave</label>
+            <div class="form-fields">
+                <input type="number" value="${particlesPerWave}" name="flags.particle-pandemonium.particlesPerWave" placeholder="6"  data-dtype="Number" />
+                </div>
+        </div>
+
+        <div class="form-group slim">
+            <label>Max Particles Particles</label>
+            <div class="form-fields">
+                <input type="number" value="${particlesMax}" name="flags.particle-pandemonium.particlesMax" placeholder="500"  data-dtype="Number" />
+                </div>
+        </div>
+
+       <div class="form-group slim">
+            <label>Image Scale</label>
+            <div class="form-fields">
+                <input type="number" value="${scale}" name="flags.particle-pandemonium.scale" placeholder="1" step="0.01" data-dtype="Number" />
+                </div>
+        </div>
+
+       <div class="form-group slim">
+            <label>Movement Speed Multiplier</label>
+            <div class="form-fields">
+                <input type="number" value="${moveSpeed}" name="flags.particle-pandemonium.moveSpeed" placeholder="1" step="0.01" data-dtype="Number" />
+                </div>
         </div>
         `;
 
@@ -45,16 +81,15 @@ export class ExampleClass {
 
     async prepareEmitterData(document) {
         const texture = document.flags?.["particle-pandemonium"]?.texture.src ?? ExampleClass.defaultTexture;
-        // const randomLeaf = Math.floor(Math.random() * 6) + 1;
         const func = {
-            lifetime: { min: 3, max: 4 },
-            frequency: 0.056,
-            // spawnChance: 1,
+            lifetime: {
+                min: document.flags?.["particle-pandemonium"]?.lifetimeMin ?? ExampleClass.lifetimeMin,
+                max: document.flags?.["particle-pandemonium"]?.lifetimeMax ?? ExampleClass.lifetimeMax
+            },
+            frequency: 0.056 / (document.flags?.["particle-pandemonium"]?.frequencyMultiplier ?? ExampleClass.frequencyMultiplier),
             particlesPerWave: document.flags?.["particle-pandemonium"]?.particlesPerWave ?? ExampleClass.particlesPerWave,
-            // emitterLifetime: 2.5,
-            maxParticles: 500,
-            pos: {x:document.x, y:document.y},
-            // autoUpdate: true,
+            maxParticles: document.flags?.["particle-pandemonium"]?.particlesMax ?? ExampleClass.particlesMax,
+            pos: { x: document.x, y: document.y },
             behaviors: [
                 {
                     type: "alpha",
@@ -95,8 +130,3 @@ export class ExampleClass {
         return func;
     }
 }
-
-Hooks.on("renderParticleEmitterConfig", (app, html, data) => {
-    if (app.object.particleFunction !== "example") return;
-    app.checkFunctionHTML();
-});

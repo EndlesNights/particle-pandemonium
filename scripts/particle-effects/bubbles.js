@@ -44,30 +44,10 @@ export class Bubble {
 	}
 
 	async prepareEmitterData(document) {
-		const randomLeaf = Math.floor(Math.random() * 6) + 1;
-		let images = [
-			// "ui/particles/leaf1.png",
-			// "ui/particles/leaf2.png",
-			// "ui/particles/leaf3.png",
-			// "ui/particles/leaf4.png",
-			"modules/particle-pandemonium/assets/images/Bubbles99.png",
-			"modules/particle-pandemonium/assets/images/Pop1.png",
-			"modules/particle-pandemonium/assets/images/Pop2.png",
-			"modules/particle-pandemonium/assets/images/Pop3.png",
-		];
-		let textureArray = [];
-		for (let i = 0; i < 4; i++) {
-			let texture = PIXI.Texture.from(images[i]);
-			textureArray.push(texture);
-		};
 
-		const animatedSprite = new PIXI.AnimatedSprite(textureArray);
-		animatedSprite.animationSpeed = 100;
-		animatedSprite.blendMode = 1;
-		animatedSprite.loop = false;
-		animatedSprite.framerate = -1;
+		const configURL = document.flags?.["particle-pandemonium"]?.animationURL ?? 'modules/particle-pandemonium/assets/animation/anim-bubble-pop.json';
+		const animatedSingleConfig = await foundry.utils.fetchJsonWithTimeout(configURL);
 
-		console.log(animatedSprite)
 		const func = {
 			"lifetime": {
 				"min": 2,
@@ -80,23 +60,6 @@ export class Bubble {
 			pos: { x: document.x, y: document.y },
 			// autoUpdate: true,
 			"behaviors": [
-				// {
-				// 	"type": "alpha",
-				// 	"config": {
-				// 		"alpha": {
-				// 			"list": [
-				// 				{
-				// 					"time": 0,
-				// 					"value": 1
-				// 				},
-				// 				{
-				// 					"time": 1,
-				// 					"value": 0.02
-				// 				}
-				// 			]
-				// 		}
-				// 	}
-				// },
 				{
 					"type": "moveSpeed",
 					"config": {
@@ -145,19 +108,18 @@ export class Bubble {
 				{
 					type: "animatedSingle",
 					config: {
-						anim: {
-							framerate: -1,
-							textures:[
-								{texture: "modules/particle-pandemonium/assets/images/Bubbles99.png", count: 80},
-								{texture: "modules/particle-pandemonium/assets/images/Pop1.png", count: 0.5},
-								{texture: "modules/particle-pandemonium/assets/images/Pop2.png", count: 0.5},
-								{texture: "modules/particle-pandemonium/assets/images/Pop3.png", count: 0.5},
-							],
-						}
-
+						anim: animatedSingleConfig
+						// {
+						// 	framerate: -1,
+						// 	textures:[
+						// 		{texture: "modules/particle-pandemonium/assets/images/Bubbles99.png", count: 80},
+						// 		{texture: "modules/particle-pandemonium/assets/images/Pop1.png", count: 1},
+						// 		{texture: "modules/particle-pandemonium/assets/images/Pop2.png", count: 1},
+						// 		{texture: "modules/particle-pandemonium/assets/images/Pop3.png", count: 1},
+						// 	],
+						// }
 					}
 				},
-
 				{
 					"type": "spawnPoint",
 					"config": {}
@@ -167,8 +129,3 @@ export class Bubble {
 		return func;
 	}
 }
-
-Hooks.on("renderParticleEmitterConfig", (app, html, data) => {
-	if (app.object.particleFunction !== "gas") return;
-	app.checkFunctionHTML();
-});
