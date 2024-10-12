@@ -60,6 +60,7 @@ export class BaseParticleEmitter extends foundry.abstract.Document {
       // name: new fields.StringField({ required: true, blank: false }),
       x: new fields.NumberField({ required: true, nullable: false, integer: true }),
       y: new fields.NumberField({ required: true, nullable: false, integer: true }),
+      playbackSpeed: new fields.NumberField({ required: true, nullable: false, initial: 1 }),
       elevation: new fields.NumberField({required: true, nullable: false, initial: 0}),
       rotation: new fields.AngleField(),
       vision: new fields.BooleanField(),
