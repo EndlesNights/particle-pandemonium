@@ -6,39 +6,50 @@
         </a>
     </nav>
     <div class="tab" data-tab="main">
-        <legend>Particle Emitter Placement</legend>
-        <div class="form-group">
-            <label>{{ localize "XCoord" }} <span class="units">({{ localize "Pixels" }})</span></label>
-            <input type="text" name="x" placeholder="X" value="{{ data.x }}" data-dtype="Number" />
-        </div>
 
-        <div class="form-group">
-            <label>{{ localize "YCoord" }} <span class="units">({{ localize "Pixels" }})</span></label>
-            <input type="text" name="y" placeholder="Y" value="{{ data.y }}" data-dtype="Number" />
-        </div>
-
-        <div class="form-group"><label>Always Render</label>
-            <div class="form-fields">
-                <input type="checkbox" name="alwaysRender" data-dtype="Boolean" {{checked data.alwaysRender}}/>
+        <fieldset>
+            <legend>Particle Emitter Core</legend>
+            
+            <div class="form-group slim">
+                <label>Coordinates <span class="units">(Pixels)</span></label>
+                <div class="form-fields">
+                    <label>X</label>
+                    <input type="number" name="x" placeholder="X" value="{{ data.x }}" data-dtype="Number" />
+        
+                    <label>Y</label>
+                    <input type="number" name="y" placeholder="Y" value="{{ data.y }}" data-dtype="Number" />
+                </div>
             </div>
-            <p class="hint">Render particle effects overtop of fog of war.</p>
-        </div>
 
-        <!-- <div class="form-group slim">
-            <label>Elevation <span class="units">(ft)</span></label>
-            <div class="form-fields">
-                <input type="number" name="elevation" value="{{ data.elevation }}" step="any" placeholder="ft">
+            <div class="form-group slim">
+                <label>Play Backspeed Multiplier</label>
+                <div class="form-fields">
+                    <input type="number" name="playbackSpeed" placeholder="1" value="{{ data.playbackSpeed }}" step="0.01" data-dtype="Number" />
+                </div>
             </div>
-        </div> -->
 
-        <div class="form-group">
-            <label>Particle Function</label>
-            <select name="particleFunction">
-                {{selectOptions particleFunctionTypes selected=data.particleFunction blank=""}}
-            </select>
-        </div>
+            <div class="form-group"><label>Always Render</label>
+                <div class="form-fields">
+                    <input type="checkbox" name="alwaysRender" data-dtype="Boolean" {{checked data.alwaysRender}}/>
+                </div>
+                <p class="hint">Render particle effects overtop of fog of war.</p>
+            </div>
 
-        <hr>
+            <!-- <div class="form-group slim">
+                <label>Elevation <span class="units">(ft)</span></label>
+                <div class="form-fields">
+                    <input type="number" name="elevation" value="{{ data.elevation }}" step="any" placeholder="ft">
+                </div>
+            </div> -->
+
+            <div class="form-group">
+                <label>Particle Function</label>
+                <select name="particleFunction">
+                    {{selectOptions particleFunctionTypes selected=data.particleFunction blank=""}}
+                </select>
+            </div>
+        </fieldset>
+        
         <section class="function-elements">
         </section>
     </div>
@@ -46,6 +57,6 @@
     
     <!-- Sheet Footer -->
     <footer class="sheet-footer flexrow">
-        <button type="submit" name="submit" value="1"><i class="far fa-save"></i> Submit</button>
+        <button type="submit" name="submit" value="1"><i class="far fa-save"></i> Update Partile Emitter</button>
     </footer>
 </form>
