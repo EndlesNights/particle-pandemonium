@@ -52,6 +52,18 @@ export class ParticleEmitter extends PlaceableObject {
         return id;
     }
 
+//     /**
+//  * Is this placeable object a temporary preview?
+//  * @type {boolean}
+//  */
+//     get isPreview() {
+//         console.log("isPreview?")
+//         console.log(!!this._original)
+//         console.log(!this.document.id)
+//         console.log(this)
+//         return !!this._original || !this.document.id;
+//     }
+
     get icon() {
         return this.document.icon || PARTICLE_EMITTER_DEFAULTS.icon
     }
@@ -406,8 +418,7 @@ export class ParticleEmitter extends PlaceableObject {
         }
 
         // Create the particle emitter if necessary
-        const particleEmitterFunction = this.getParticleFunction();
-        if (particleEmitterFunction) {
+        if (this.document.particleFunction) {
             if (this.isPreview) return // Don't create for preveiw
             if (this.pixiEmitter) { this.updatePixiParticleEmitter(); }
             else { this.#createPixiParticleEmitter(); }
@@ -420,17 +431,15 @@ export class ParticleEmitter extends PlaceableObject {
         if (this.layer.active) this.renderFlags.set({ refreshField: true });
     }
 
-    getParticleClass(){
+    getParticleClass() {
         if (!this.document.particleFunction) return;
         return new CONFIG[`${MODULE_ID}`].particleFunctionTypes[this.document.particleFunction].effectClass();
     }
 
-    getParticleFunction() {
+    async getParticleFunction() {
         if (!this.document.particleFunction) return;
-        const particleClass = new CONFIG[`${MODULE_ID}`].particleFunctionTypes[this.document.particleFunction].effectClass();
-        // const func = CONFIG[`${MODULE_ID}`]?.particleFunctionTypes[this.document.particleFunction]?.effectClass.prepareEmitterData(this.document);
-        const func = this.getParticleClass().prepareEmitterData(this.document);
-
+        const particleClass = await new CONFIG[`${MODULE_ID}`].particleFunctionTypes[this.document.particleFunction].effectClass();
+        const func = await this.getParticleClass().prepareEmitterData(await this.document);
         return func;
     }
 
@@ -444,11 +453,13 @@ export class ParticleEmitter extends PlaceableObject {
         if (await this.document.hidden) return; //Do Not create if hidden
 
         const particleFunction = await this.getParticleFunction();
-        if(!particleFunction) return; //Stop everything else if no function;
+        if (!particleFunction) return; //Stop everything else if no function;
+
+        //Check for a container and create one if one is not ready
         if (!this.particalContainer) await this.#createPixiParticalContainer();
 
-        if(!this.renderer){
-            this.renderer = new PIXI.Renderer({veiw: document.getElementById('board')});
+        if (!this.renderer) {
+            this.renderer = new PIXI.Renderer({ veiw: document.getElementById('board') });
         }
 
         // let urls;
@@ -466,19 +477,15 @@ export class ParticleEmitter extends PlaceableObject {
 
         //     this.update();
         // });
-        
+
         this.pixiEmitter = new PIXI.particles.Emitter(this.particalContainer, await particleFunction);
         this.update();
     }
 
     async updatePixiParticleEmitter() {
-        // await this.pixiEmitter.updateBehaviors(await this.getParticleFunction());
         if (this.pixiEmitter) await this.#destroyParticleEmitter();
-
         if (this.document.hidden) return;
-
         await this.#createPixiParticleEmitter();
-        // this.pixiEmitter = new PIXI.particles.Emitter(this.particalContainer, await this.getParticleFunction());
     }
 
     /* -------------------------------------------- */
@@ -496,7 +503,7 @@ export class ParticleEmitter extends PlaceableObject {
         if (this.document.alwaysRender) { //Check if the particles should been seen through fog of war or not
             layer = canvas.rendered;
         } else {
-            layer = canvas.primary; 
+            layer = canvas.primary;
         }
 
         layer.addChild(this.particalContainer);
@@ -526,8 +533,8 @@ export class ParticleEmitter extends PlaceableObject {
         this.updateFrameId = requestAnimationFrame(this.update);
         const now = Date.now();
 
-        if(this.pixiEmitter){
-            this.pixiEmitter.update((now - this.elapsed) * 0.001);
+        if (this.pixiEmitter) {
+            this.pixiEmitter.update((now - this.elapsed) * 0.001 * this.document.playbackSpeed);
         }
 
         // if(this.updateHook){

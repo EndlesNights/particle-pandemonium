@@ -45,10 +45,20 @@ export class ParticleEmitterConfig extends DocumentSheet {
 
   /** @override */
   async _render(force, options) {
-    if (!this.rendered) this.original = this.object.clone({}, { keepId: true })
+    if (!this.rendered) {
+      this.original = this.object.clone({}, { keepId: true });
+      this.preview = this;
+    }
     return super._render(force, options)
   }
 
+  /** @inheritDoc */
+  async _preRender(context, options) {
+    await super._preRender(context, options);
+    if ( this.preview?.rendered ) {
+      this._previewChanges();
+    }
+  }
   /* -------------------------------------------- */
 
   /** @override */
@@ -117,7 +127,6 @@ export class ParticleEmitterConfig extends DocumentSheet {
     super.activateListeners(html)
     this.iconPicker = html.find('file-picker[name="icon"]')[0]
     html.find('img.select-icon').click(this._onSelectIcon.bind(this))
-    html.find('button[name="resetDefault"]').click(this._onResetDefaults.bind(this))
   }
 
   /* -------------------------------------------- */
@@ -129,32 +138,7 @@ export class ParticleEmitterConfig extends DocumentSheet {
   }
 
   /* -------------------------------------------- */
-
-  /**
-   * Reset the ParticleEmitter configuration settings to their default values
-   * @param event
-   * @private
-   */
-  _onResetDefaults(event) {
-    event.preventDefault()
-
-    const defaults = ParticleEmitterDocument.cleanData()
-
-    for (const key in defaults) {
-      // don't reset internal and required fields
-      if (key.startsWith('_') || NO_RESET_DEFAULT.includes(key)) {
-        delete defaults[key]
-        continue
-      }
-
-      // use default value or null
-      defaults[key] = PARTICLE_EMITTER_DEFAULTS[key] ?? null
-    }
-
-    this._previewChanges(defaults)
-    this.render()
-  }
-
+  /*  Real-Time Preview                           */
   /* -------------------------------------------- */
 
   /**
@@ -188,13 +172,12 @@ export class ParticleEmitterConfig extends DocumentSheet {
   /* -------------------------------------------- */
 
   /** @inheritdoc */
-  async _onChangeInput(event) {
-
-    await super._onChangeInput(event)
+  _onChangeInput(event) {
+    super._onChangeInput(event)
     const previewData = this._getSubmitData()
     this._previewChanges(previewData)
 
-    if(event.target.name === "particleFunction") this.checkFunctionHTML();
+    if (event.target.name === "particleFunction") this.checkFunctionHTML();
   }
 
   /* -------------------------------------------- */
@@ -218,7 +201,11 @@ export class ParticleEmitterConfig extends DocumentSheet {
   /** @override */
   async _updateObject(event, formData) {
     this._resetPreview()
-    if (this.object.id) return this.object.update(formData)
+
+    if (this.object.id){
+      // this._previewChanges(this.object.toObject())
+      return this.object.update(formData);
+    };
     return this.object.constructor.create(formData, { parent: canvas.scene })
   }
 
@@ -227,7 +214,6 @@ export class ParticleEmitterConfig extends DocumentSheet {
     if (!this.object.particleFunction) return;
 
     CONFIG[`${MODULE_ID}`]?.particleFunctionTypes[this.object.particleFunction].effectClass.addHTMLFeilds(this);
-    // this._element.style.height = 'auto';
     this._element.css('height', 'auto');
 
   }
@@ -242,3 +228,7 @@ export class ParticleEmitterConfig extends DocumentSheet {
     });
   }
 }
+
+Hooks.on("renderParticleEmitterConfig", (app, html, data) => {
+  app.checkFunctionHTML();
+});
