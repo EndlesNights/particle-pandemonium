@@ -13,7 +13,7 @@ export class ExampleClass {
     static addHTMLFeilds(element) {
         const doc = element.object;
 
-        let textureSRC = doc.flags?.["particle-pandemonium"]?.texture.src ?? ExampleClass.defaultTexture;
+        let textureSRC = doc.flags?.["particle-pandemonium"]?.texture?.src ?? ExampleClass.defaultTexture;
         let particlesPerWave = doc.flags?.["particle-pandemonium"]?.particlesPerWave ?? ExampleClass.particlesPerWave;
         let particlesMax = doc.flags?.["particle-pandemonium"]?.particlesMax ?? ExampleClass.particlesMax;
         let scale = doc.flags?.["particle-pandemonium"]?.scale ?? ExampleClass.scale;
@@ -32,47 +32,47 @@ export class ExampleClass {
 
         <div class="form-group slim">
             <label>Lifetime</label>
-                <div class="form-fields">
-                    <label>Min</label>
-                    <input type="number" value="${lifetimeMin}" name="flags.particle-pandemonium.lifetimeMin" placeholder="3" step="0.01" data-dtype="Number" />
-                    <label>Max</label>
-                    <input type="number" value="${lifetimeMax}" name="flags.particle-pandemonium.lifetimeMax" placeholder="4" step="0.01" data-dtype="Number" />
-                </div>
+            <div class="form-fields">
+                <label>Min</label>
+                <input type="number" value="${lifetimeMin}" name="flags.particle-pandemonium.lifetimeMin" placeholder="3" step="0.01" data-dtype="Number" />
+                <label>Max</label>
+                <input type="number" value="${lifetimeMax}" name="flags.particle-pandemonium.lifetimeMax" placeholder="4" step="0.01" data-dtype="Number" />
+            </div>
         </div>
 
        <div class="form-group slim">
             <label>Frequency Multiplier</label>
             <div class="form-fields">
                 <input type="number" value="${frequencyMultiplier}" name="flags.particle-pandemonium.frequencyMultiplier" placeholder="1" step="0.01" data-dtype="Number" />
-                </div>
+            </div>
         </div>
 
         <div class="form-group slim">
             <label>Particles Per Wave</label>
             <div class="form-fields">
                 <input type="number" value="${particlesPerWave}" name="flags.particle-pandemonium.particlesPerWave" placeholder="6"  data-dtype="Number" />
-                </div>
+            </div>
         </div>
 
         <div class="form-group slim">
             <label>Max Particles Particles</label>
             <div class="form-fields">
                 <input type="number" value="${particlesMax}" name="flags.particle-pandemonium.particlesMax" placeholder="500"  data-dtype="Number" />
-                </div>
+            </div>
         </div>
 
        <div class="form-group slim">
             <label>Image Scale</label>
             <div class="form-fields">
                 <input type="number" value="${scale}" name="flags.particle-pandemonium.scale" placeholder="1" step="0.01" data-dtype="Number" />
-                </div>
+            </div>
         </div>
 
        <div class="form-group slim">
             <label>Movement Speed Multiplier</label>
             <div class="form-fields">
                 <input type="number" value="${moveSpeed}" name="flags.particle-pandemonium.moveSpeed" placeholder="1" step="0.01" data-dtype="Number" />
-                </div>
+            </div>
         </div>
         `;
 
@@ -80,7 +80,7 @@ export class ExampleClass {
     }
 
     async prepareEmitterData(document) {
-        const texture = document.flags?.["particle-pandemonium"]?.texture.src ?? ExampleClass.defaultTexture;
+        const texture = document.flags?.["particle-pandemonium"]?.texture?.src ?? ExampleClass.defaultTexture;
         const func = {
             lifetime: {
                 min: document.flags?.["particle-pandemonium"]?.lifetimeMin ?? ExampleClass.lifetimeMin,

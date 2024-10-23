@@ -10,6 +10,7 @@ import { ParticleEmitterLayer } from './ParticleEmitterLayer.js'
 import { ExampleClass } from './particle-effects/example-dispersion.js';
 import { Gas } from './particle-effects/gas.js';
 import { Bubble } from './particle-effects/bubbles.js';
+import { FlamePillar } from './particle-effects/flame-pillar.js';
 
 
 Hooks.once('init', () => {
@@ -86,5 +87,11 @@ function registerParticleEffectFunctions(){
         id: "bubble",
         label: "Bubble Animation Function",
         effectClass: Bubble
+    };
+
+    CONFIG[`${MODULE_ID}`].particleFunctionTypes.flamePillar = {
+        id: "flamePillar",
+        label: "Flame Pillar Function",
+        effectClass: FlamePillar
     };
 };

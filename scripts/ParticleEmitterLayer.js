@@ -96,7 +96,14 @@ export class ParticleEmitterLayer extends PlaceablesLayer {
     /** @override */
     _onMouseWheel(event) {
         console.log("_onMouseWheel");
-        //TODO Rotation Optiosn here in 
+        // Identify the hovered light source
+        const emitter = this.hover;
+        if (!emitter || emitter.isPreview ) return;
+
+        // Determine the incremental angle of rotation from event data
+        const snap = event.shiftKey ? 15 : 3;
+        const delta = snap * Math.sign(event.delta);
+        return emitter.rotate(emitter.document.rotation + delta, snap);
     }
 
     /* -------------------------------------------- */

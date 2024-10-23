@@ -98,6 +98,8 @@ export class ParticleEmitterConfig extends DocumentSheet {
     // this.checkFunctionHTML();
     data.id = {};
     if (this.object.particleFunction) { data.id[this.object.particleFunction] = true };
+
+    console.log(data)
     return {
       ...data,
       status: this.document.object.status,
