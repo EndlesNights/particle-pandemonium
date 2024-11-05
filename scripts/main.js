@@ -7,10 +7,13 @@ import { performMigrations } from './migration.js'
 import { registerSettings, MODULE_ID } from './settings.js'
 import { ParticleEmitter } from './ParticleEmitter.js'
 import { ParticleEmitterLayer } from './ParticleEmitterLayer.js'
+
+//Particle Emiter Functions
 import { ExampleClass } from './particle-effects/example-dispersion.js';
 import { Gas } from './particle-effects/gas.js';
 import { Bubble } from './particle-effects/bubbles.js';
 import { FlamePillar } from './particle-effects/flame-pillar.js';
+import { FireFlame } from './particle-effects/fire-flame.js';
 
 
 Hooks.once('init', () => {
@@ -93,5 +96,11 @@ function registerParticleEffectFunctions(){
         id: "flamePillar",
         label: "Flame Pillar Function",
         effectClass: FlamePillar
+    };
+
+    CONFIG[`${MODULE_ID}`].particleFunctionTypes.fireFlame = {
+        id: "fireFlame",
+        label: "Fire Flame Function",
+        effectClass: FireFlame
     };
 };
